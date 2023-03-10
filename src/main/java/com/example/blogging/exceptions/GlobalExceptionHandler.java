@@ -2,6 +2,7 @@ package com.example.blogging.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -20,10 +22,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(msg, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<Object> usernameNotFoundException(UsernameNotFoundException ex){
+        String msg="User Not Found";
+        return new ResponseEntity<>(msg, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(UserAlreadyExists.class)
     public ResponseEntity<Object> userAlreadyExistsException(UserAlreadyExists ex){
         String msg=ex.getMessage();
-        return new ResponseEntity<>(msg, HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(msg, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -35,7 +43,7 @@ public class GlobalExceptionHandler {
             resp.put(fieldName,errorMsg);
         });
 
-        return new ResponseEntity<>(resp, HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(resp, HttpStatus.BAD_REQUEST);
     }
 
 
@@ -90,5 +98,11 @@ public class GlobalExceptionHandler {
         RoleAlreadyExistsException ex=new RoleAlreadyExistsException();
         String msg="Role Already Exists!!!";
         return new ResponseEntity<>(msg, HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<Object> noSuchElementException(NoSuchElementException ex){
+        String msg=ex.getMessage();
+        return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
     }
 }

@@ -26,6 +26,9 @@ public class Post {
 
     private String imageName;
 
+    private String description;
+
+    @Column(columnDefinition = "longtext")
     private String content;
 
     private Date addedDate;

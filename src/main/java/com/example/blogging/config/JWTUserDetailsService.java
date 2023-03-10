@@ -30,6 +30,5 @@ public class JWTUserDetailsService implements UserDetailsService {
             return new SimpleGrantedAuthority(r.getName());
         }).collect(Collectors.toList());
         return new User(user.getEmail(),user.getPassword(),grantedAuthorities);
-
     }
 }

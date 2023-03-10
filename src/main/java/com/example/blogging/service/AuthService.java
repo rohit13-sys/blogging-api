@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AuthService {
 
-    UserDetails isvalidUser(JwtAuthRequest request) throws Exception;
+    UserDetails isvalidUser(JwtAuthRequest request);
 
 
     String getLoggedInUserName();

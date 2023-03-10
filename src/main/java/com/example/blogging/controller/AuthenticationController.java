@@ -2,17 +2,21 @@ package com.example.blogging.controller;
 
 
 import com.example.blogging.config.JWTUtil;
+import com.example.blogging.entity.Users;
 import com.example.blogging.payloads.JwtAuthRequest;
 import com.example.blogging.payloads.JwtAuthResponse;
 import com.example.blogging.payloads.UserDto;
+import com.example.blogging.payloads.UserResponse;
 import com.example.blogging.service.AuthService;
 import com.example.blogging.service.UserService;
 import org.apache.catalina.session.StandardSession;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,21 +36,30 @@ public class AuthenticationController {
     private AuthService authService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private JWTUtil jwtUtil;
+
+    @Autowired
+    private ModelMapper mapper;
 
 //    @Value("${my.greeting}")
 
 
     @PostMapping("/authenticate")
-    public ResponseEntity<JwtAuthResponse> generateToken(@RequestBody JwtAuthRequest request,HttpSession session) throws Exception {
+    public ResponseEntity<JwtAuthResponse> generateToken( @Valid @RequestBody JwtAuthRequest request,HttpSession session) {
 
 
         UserDetails userDetails= authService.isvalidUser(request);
         String userName= userDetails.getUsername();
         session.setAttribute("userName",userName);
         final String token = jwtUtil.generateToken(userDetails);
-        JwtAuthResponse response=new JwtAuthResponse(token);
-        System.out.println(session.getAttribute("userName"));
+        UserDto userDto=userService.getUserByUserName(userDetails.getUsername());
+//        UserResponse userResponse=mapper.map(userDto,UserResponse.class);
+        JwtAuthResponse response=new JwtAuthResponse();
+        response.setToken(token);
+        response.setUserDto(userDto);
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 

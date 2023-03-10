@@ -28,7 +28,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/posts")
+@RequestMapping("/api/v1/posts")
 public class PostController {
 
     @Autowired
@@ -58,11 +58,12 @@ public class PostController {
     }
 
     @GetMapping("all-posts")
-    public ResponseEntity<Object> getAllPosts(@RequestParam(value = "pageNo", defaultValue = Constants.PAGE_NUMBER, required = false) Integer pageNumber,
+    public ResponseEntity<PostResponse> getAllPosts(@RequestParam(value = "pageNo", defaultValue = Constants.PAGE_NUMBER, required = false) Integer pageNumber,
                                               @RequestParam(value = "pageSize", defaultValue = Constants.PAGE_SIZE, required = false) Integer pageSize,
                                               @RequestParam(value = "sortBy", defaultValue = Constants.SORT_BY, required = false) String sortBy,
                                               @RequestParam(value = "sortDir", defaultValue = Constants.SORT_ORDER, required = false) String sortDir) {
         PostResponse postResponse = postService.getAllPosts(pageNumber, pageSize, sortBy, sortDir);
+        System.out.println("pageNo : "+pageNumber+", pageSize : "+pageSize+"\n>>>>>>>>>>>>>>>>");
         return new ResponseEntity<>(postResponse, HttpStatus.OK);
     }
 
@@ -101,9 +102,11 @@ public class PostController {
     }
 
 
-    @GetMapping("/image/{postId}")
+    @GetMapping(value="/image/{postId}",
+            produces = {"*/*"})
     public ResponseEntity<Object> serveImage(@PathVariable("postId") Integer postId, HttpServletResponse response) throws IOException {
 
+        System.out.println(postId);
         InputStream is=postService.getImage(postId);
         response.setContentType(MediaType.IMAGE_JPEG_VALUE);
         return new ResponseEntity<>( StreamUtils.copy(is,response.getOutputStream()),HttpStatus.OK);
