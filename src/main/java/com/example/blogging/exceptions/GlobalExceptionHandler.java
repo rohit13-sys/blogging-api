@@ -105,4 +105,10 @@ public class GlobalExceptionHandler {
         String msg=ex.getMessage();
         return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(FileFormatNotSupportedException.class)
+    public ResponseEntity<Object> fileFormatNotSupportedException(FileFormatNotSupportedException ex){
+        String msg="File Format Not Supported";
+        return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
+    }
 }

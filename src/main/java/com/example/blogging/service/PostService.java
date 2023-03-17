@@ -18,7 +18,7 @@ public interface PostService {
 
     PostDto updatePost(PostDto postDto,int id);
 
-    void deletePost(PostDto postDto);
+    void deletePost(PostDto postDto) throws IOException;
 
     PostResponse getAllPosts(Integer pageNumber, Integer pageSize,String sortBy,String sortDir);
 
@@ -27,7 +27,7 @@ public interface PostService {
     List<PostDto> getPostByCategory(int categoryId);
 
 
-    List<PostDto> getPostByUser(int userId);
+    PostResponse getPostByUser(int userId,Integer pageNumber, Integer pageSize,String sortBy,String sortDir);
 
     List<PostDto> searchPosts(String keyword);
 

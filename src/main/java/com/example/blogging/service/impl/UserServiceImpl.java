@@ -114,11 +114,28 @@ public class UserServiceImpl implements UserService {
 
     Users dtoToUser(UserDto userDto){
 
-        RoleDto roleDto=roleService.getRole(Constants.NORMAL_USER);
-        Role role=modelMapper.map(roleDto,Role.class);
+        List<Role> roles=new ArrayList<>();
+        if(!userDto.getRoles().isEmpty()){
+            List<RoleDto> roleDtos=new ArrayList<>();
+            for(RoleDto roleDto: userDto.getRoles()){
+                RoleDto role=roleService.getRole(roleDto.getName());
+                roleDtos.add(role);
+            }
+
+           roles=roleDtos.stream().map((roleDto -> modelMapper.map(roleDto, Role.class))).collect(Collectors.toList());
+        }else{
+            RoleDto roleDto=roleService.getRole(Constants.NORMAL_USER);
+            roles.add(modelMapper.map(roleDto, Role.class));
+
+        }
+
+
+
+//        RoleDto roleDto=roleService.getRole(Constants.NORMAL_USER);
+//        Role role=modelMapper.map(roleDto,Role.class);
 
         Users user=modelMapper.map(userDto, Users.class);
-        user.getRoles().add(role);
+        user.setRoles(roles);
         user.setPassword(encoder.encode(userDto.getPassword()));
         return user;
     }

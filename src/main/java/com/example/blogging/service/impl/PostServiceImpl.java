@@ -12,6 +12,8 @@ import com.example.blogging.repository.CategoryRepository;
 import com.example.blogging.repository.PostRepository;
 import com.example.blogging.repository.UserReposiory;
 import com.example.blogging.service.PostService;
+import org.apache.commons.io.FileDeleteStrategy;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -58,7 +61,7 @@ public class PostServiceImpl implements PostService {
         Users user = userReposiory.findById(userId).orElseThrow(() -> new UserNotFound("User Not Found!!"));
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFound("User Not Found!!"));
         Post post = mapper.map(postDto, Post.class);
-        post.setImageName("default.png");
+        post.setImageName("default.jpg");
         post.setAddedDate(new Date());
         post.setUser(user);
         post.setCategory(category);
@@ -71,17 +74,30 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("Post Not Found with id : " + id));
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
-        post.setImageName(postDto.getImageName());
+        post.setDescription(postDto.getDescription());
+        if(!postDto.getImageName().isBlank()){
+            post.setImageName(postDto.getImageName());
+        }
         post.setAddedDate(new Date());
+        Category category=categoryRepository.findById(postDto.getCategory().getId())
+                .orElseThrow(()->new CategoryNotFound("Category not found"));
+        post.setCategory(category);
         post = postRepository.save(post);
         return mapper.map(post, PostDto.class);
     }
 
     @Override
-    public void deletePost(PostDto postDto) {
+    public void deletePost(PostDto postDto) throws IOException {
+
 
         Post post = mapper.map(postDto, Post.class);
-        postRepository.delete(post);
+
+            postRepository.delete(post);
+
+
+
+
+
 
 
     }
@@ -105,6 +121,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto getPostById(int postId){
+
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("Post Not Found with id : " + postId));
         PostDto dto = mapper.map(post, PostDto.class);
         return dto;
@@ -119,10 +136,22 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public List<PostDto> getPostByUser(int userId) {
-        Users user = userReposiory.findById(userId).orElseThrow(() -> new UserNotFound("User not found"));
-        List<Post> post = postRepository.findByUser(user);
-        return post.stream().map((p) -> mapper.map(p, PostDto.class)).collect(Collectors.toList());
+    public PostResponse getPostByUser(int userId,Integer pageNumber, Integer pageSize,String sortBy,String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+//        Users user = userReposiory.findById(userId).orElseThrow(() -> new UserNotFound("User not found"));
+        Page<Post> page = postRepository.findByUserId(userId,pageable);
+        List<Post> posts = page.getContent();
+        List<PostDto> postsDto = posts.stream().map(p -> mapper.map(p, PostDto.class)).collect(Collectors.toList());
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContents(postsDto);
+        postResponse.setPageSize(pageSize);
+        postResponse.setPageNumber(pageNumber);
+        postResponse.setTotalElements(page.getTotalElements());
+        postResponse.setTotalPages(page.getTotalPages());
+        postResponse.setLast(page.isLast());
+        return postResponse;
+
     }
 
     @Override
@@ -160,8 +189,16 @@ public class PostServiceImpl implements PostService {
         Post post=postRepository.findById(id).orElseThrow(()->new PostNotFoundException("Post Not Found"));
         String fileName=post.getImageName();
         String fullPath=uploadDir+ File.separator+id+File.separator+fileName;
-        InputStream is=new FileInputStream(fullPath);
-        return is;
+        try{
+            InputStream is=new FileInputStream(fullPath);
+            return is;
+        }catch (Exception e){
+            fullPath=uploadDir+ File.separator+fileName;
+            InputStream is=new FileInputStream(fullPath);
+            return is;
+        }
+
+
 
     }
 
