@@ -10,6 +10,8 @@ import com.example.blogging.repository.CategoryRepository;
 import com.example.blogging.service.CategoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -65,8 +67,10 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
+
     @Override
     public List<CategoryDto> getAllCategories() {
+        System.out.println("First time call for all category");
         List<Category> categories=categoryRepository.findAll();
         return categories.stream().map(this::categoryToDto).collect(Collectors.toList());
     }
