@@ -35,4 +35,6 @@ public interface PostService {
     PostDto uploadImage(String fileName, MultipartFile file, int id) throws IOException;
 
     InputStream getImage(Integer id) throws FileNotFoundException;
+
+    void storeLikeCounts(Integer postId,Long likeCounts);
 }

@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +27,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private Map<String,CategoryDto> categoryMap;
 
     @Override
     public CategoryDto createCategory(CategoryDto categoryDto){
@@ -71,8 +76,19 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryDto> getAllCategories() {
         System.out.println("First time call for all category");
-        List<Category> categories=categoryRepository.findAll();
-        return categories.stream().map(this::categoryToDto).collect(Collectors.toList());
+        List<CategoryDto> categories=new ArrayList<>();
+        if(categoryMap.size()>0){
+            System.out.println("call to map for all category");
+            for(Map.Entry<String,CategoryDto> category:categoryMap.entrySet()){
+                categories.add(category.getValue());
+            }
+            return categories;
+        }else{
+            System.out.println("call to DB for all category");
+            categories=categoryRepository.findAll().stream().map(this::categoryToDto).collect(Collectors.toList());;
+            return categories;
+        }
+
     }
 
     @Override

@@ -122,4 +122,12 @@ public class PostController {
         return new ResponseEntity<>(postDto, HttpStatus.OK);
     }
 
+
+    @PutMapping("/post/like/{postId}/{likeCounts}")
+    public ResponseEntity<Object> storeLikedCounts(@PathVariable Integer postId,@PathVariable Long likeCounts){
+        System.out.println("PostId : "+postId+" LikeCounts : "+likeCounts);
+        postService.storeLikeCounts(postId,likeCounts);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

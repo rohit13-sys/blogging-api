@@ -22,20 +22,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,6 +51,9 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     ModelMapper mapper;
+
+    @Autowired
+    private Map<String, Long> likesMap;
 
     @Value("${project-image}")
     String uploadDir;
@@ -75,12 +77,13 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setDescription(postDto.getDescription());
-        if(!postDto.getImageName().isBlank()){
+        post.setLikeCounts(postDto.getLikeCounts());
+        if (!postDto.getImageName().isBlank()) {
             post.setImageName(postDto.getImageName());
         }
         post.setAddedDate(new Date());
-        Category category=categoryRepository.findById(postDto.getCategory().getId())
-                .orElseThrow(()->new CategoryNotFound("Category not found"));
+        Category category = categoryRepository.findById(postDto.getCategory().getId())
+                .orElseThrow(() -> new CategoryNotFound("Category not found"));
         post.setCategory(category);
         post = postRepository.save(post);
         return mapper.map(post, PostDto.class);
@@ -92,12 +95,7 @@ public class PostServiceImpl implements PostService {
 
         Post post = mapper.map(postDto, Post.class);
 
-            postRepository.delete(post);
-
-
-
-
-
+        postRepository.delete(post);
 
 
     }
@@ -120,9 +118,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto getPostById(int postId){
+    public PostDto getPostById(int postId) {
 
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("Post Not Found with id : " + postId));
+        if(likesMap.containsKey(String.valueOf(postId))){
+            long likeCounts=likesMap.get(String.valueOf(postId));
+            post.setLikeCounts(likeCounts);
+        }
         PostDto dto = mapper.map(post, PostDto.class);
         return dto;
     }
@@ -136,11 +138,11 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public PostResponse getPostByUser(int userId,Integer pageNumber, Integer pageSize,String sortBy,String sortDir) {
+    public PostResponse getPostByUser(int userId, Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 //        Users user = userReposiory.findById(userId).orElseThrow(() -> new UserNotFound("User not found"));
-        Page<Post> page = postRepository.findByUserId(userId,pageable);
+        Page<Post> page = postRepository.findByUserId(userId, pageable);
         List<Post> posts = page.getContent();
         List<PostDto> postsDto = posts.stream().map(p -> mapper.map(p, PostDto.class)).collect(Collectors.toList());
         PostResponse postResponse = new PostResponse();
@@ -156,16 +158,16 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostDto> searchPosts(String keyword) {
-        List<Post> posts=postRepository.findByTitleOrContentContains(keyword);
-        List<PostDto> postDtos=posts.stream().map(p->mapper.map(p,PostDto.class)).collect(Collectors.toList());
+        List<Post> posts = postRepository.findByTitleOrContentContains(keyword);
+        List<PostDto> postDtos = posts.stream().map(p -> mapper.map(p, PostDto.class)).collect(Collectors.toList());
         return postDtos;
     }
 
     @Override
-    public PostDto uploadImage(String fileName, MultipartFile file,int id) throws IOException {
-        Post post=postRepository.findById(id).orElseThrow(()->new PostNotFoundException("Post Not Found Exception"));
+    public PostDto uploadImage(String fileName, MultipartFile file, int id) throws IOException {
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("Post Not Found Exception"));
 
-        Path uploadPath = Paths.get(uploadDir+ File.separator+id);
+        Path uploadPath = Paths.get(uploadDir + File.separator + id);
 
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
@@ -173,9 +175,9 @@ public class PostServiceImpl implements PostService {
 
         try (InputStream inputStream = file.getInputStream()) {
             String fileCode = RandomStringUtils.randomAlphanumeric(8);
-            fileName=fileCode+"_"+fileName;
+            fileName = fileCode + "_" + fileName;
             post.setImageName(fileName);
-            post=   postRepository.save(post);
+            post = postRepository.save(post);
             Path filePath = uploadPath.resolve(fileName);
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
             return mapper.map(post, PostDto.class);
@@ -186,21 +188,42 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public InputStream getImage(Integer id) throws FileNotFoundException {
-        Post post=postRepository.findById(id).orElseThrow(()->new PostNotFoundException("Post Not Found"));
-        String fileName=post.getImageName();
-        String fullPath=uploadDir+ File.separator+id+File.separator+fileName;
-        try{
-            InputStream is=new FileInputStream(fullPath);
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("Post Not Found"));
+        String fileName = post.getImageName();
+        String fullPath = uploadDir + File.separator + id + File.separator + fileName;
+        try {
+            InputStream is = new FileInputStream(fullPath);
             return is;
-        }catch (Exception e){
-            fullPath=uploadDir+ File.separator+fileName;
-            InputStream is=new FileInputStream(fullPath);
+        } catch (Exception e) {
+            fullPath = uploadDir + File.separator + fileName;
+            InputStream is = new FileInputStream(fullPath);
             return is;
         }
-
 
 
     }
 
 
+    @Override
+    public void storeLikeCounts(Integer postId, Long likeCounts) {
+        likesMap.put(String.valueOf(postId),likeCounts);
+    }
+
+
+
+    @Transactional
+    @Scheduled(cron = "1 * * * * *")
+    public void storeLikes(){
+        if(!likesMap.isEmpty()){
+                    for (Map.Entry<String,Long> like: likesMap.entrySet()) {
+                        int postId = Integer.parseInt(like.getKey());
+                        long likeCounts = like.getValue();
+                        PostDto post = getPostById(postId);
+                        post.setLikeCounts(likeCounts);
+                        post = updatePost(post, postId);
+            }
+            likesMap.clear();
+        }
+
+    }
 }
