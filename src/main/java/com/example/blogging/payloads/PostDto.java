@@ -36,4 +36,6 @@ public class PostDto {
     private Set<CommentDto> comments=new HashSet<>();
 
     private Long likeCounts;
+
+    private Long dislikeCounts;
 }

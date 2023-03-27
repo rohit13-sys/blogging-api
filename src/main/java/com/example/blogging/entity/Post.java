@@ -45,5 +45,15 @@ public class Post {
     private Set<Comment> comments=new HashSet<>();
 
 
-    private Long likeCounts;
+
+
+
+    private Long likeCounts=0L;
+
+
+
+
+    private Long dislikeCounts=0L;
+
+
 }

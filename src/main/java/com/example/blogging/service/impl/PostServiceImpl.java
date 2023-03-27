@@ -55,6 +55,9 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private Map<String, Long> likesMap;
 
+    @Autowired
+    private Map<String, Long> dislikesMap;
+
     @Value("${project-image}")
     String uploadDir;
 
@@ -78,6 +81,7 @@ public class PostServiceImpl implements PostService {
         post.setContent(postDto.getContent());
         post.setDescription(postDto.getDescription());
         post.setLikeCounts(postDto.getLikeCounts());
+        post.setDislikeCounts(post.getDislikeCounts());
         if (!postDto.getImageName().isBlank()) {
             post.setImageName(postDto.getImageName());
         }
@@ -124,6 +128,10 @@ public class PostServiceImpl implements PostService {
         if(likesMap.containsKey(String.valueOf(postId))){
             long likeCounts=likesMap.get(String.valueOf(postId));
             post.setLikeCounts(likeCounts);
+        }
+        if(dislikesMap.containsKey(String.valueOf(postId))){
+            long dislikeCounts= dislikesMap.get(String.valueOf(postId));
+            post.setDislikeCounts(dislikeCounts);
         }
         PostDto dto = mapper.map(post, PostDto.class);
         return dto;
@@ -205,8 +213,9 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public void storeLikeCounts(Integer postId, Long likeCounts) {
+    public void storeLikeCounts(Integer postId, Long likeCounts,Long dislikeCounts) {
         likesMap.put(String.valueOf(postId),likeCounts);
+        dislikesMap.put(String.valueOf(postId),dislikeCounts);
     }
 
 
@@ -214,7 +223,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Scheduled(cron = "1 * * * * *")
     public void storeLikes(){
-        if(!likesMap.isEmpty()){
+        if(!likesMap.isEmpty() || !dislikesMap.isEmpty()){
                     for (Map.Entry<String,Long> like: likesMap.entrySet()) {
                         int postId = Integer.parseInt(like.getKey());
                         long likeCounts = like.getValue();
@@ -223,6 +232,17 @@ public class PostServiceImpl implements PostService {
                         post = updatePost(post, postId);
             }
             likesMap.clear();
+        }
+
+        if(!dislikesMap.isEmpty()){
+            for (Map.Entry<String,Long> dislike: dislikesMap.entrySet()) {
+                int postId = Integer.parseInt(dislike.getKey());
+                long dislikeCounts = dislike.getValue();
+                PostDto post = getPostById(postId);
+                post.setDislikeCounts(dislikeCounts);
+                post = updatePost(post, postId);
+            }
+            dislikesMap.clear();
         }
 
     }

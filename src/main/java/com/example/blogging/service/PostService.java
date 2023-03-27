@@ -36,5 +36,5 @@ public interface PostService {
 
     InputStream getImage(Integer id) throws FileNotFoundException;
 
-    void storeLikeCounts(Integer postId,Long likeCounts);
+    void storeLikeCounts(Integer postId,Long likeCounts,Long dislikeCounts);
 }

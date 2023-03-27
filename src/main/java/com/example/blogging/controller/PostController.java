@@ -123,10 +123,10 @@ public class PostController {
     }
 
 
-    @PutMapping("/post/like/{postId}/{likeCounts}")
-    public ResponseEntity<Object> storeLikedCounts(@PathVariable Integer postId,@PathVariable Long likeCounts){
-        System.out.println("PostId : "+postId+" LikeCounts : "+likeCounts);
-        postService.storeLikeCounts(postId,likeCounts);
+    @PutMapping("/post/like/{postId}/{likeCounts}/{dislikeCounts}")
+    public ResponseEntity<Object> storeLikedCounts(@PathVariable Integer postId,@PathVariable Long likeCounts,@PathVariable Long dislikeCounts){
+        System.out.println("PostId : "+postId+" LikeCounts : "+likeCounts+" DislikeCounts : "+dislikeCounts);
+        postService.storeLikeCounts(postId,likeCounts,dislikeCounts);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

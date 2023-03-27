@@ -34,7 +34,12 @@ public class HazelcastConfig {
 
     @Bean
     public Map<String, Long> likesMap(HazelcastInstance hazelcastInstance) {
-        return hazelcastInstance.getMap("LikeMap");
+        return hazelcastInstance.getMap("likeMap");
+    }
+
+    @Bean
+    public Map<String, Long> dislikesMap(HazelcastInstance hazelcastInstance) {
+        return hazelcastInstance.getMap("dislikeMap");
     }
 
 //    @Bean
