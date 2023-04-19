@@ -1,5 +1,6 @@
 package com.example.blogging.exceptions;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -110,5 +111,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> fileFormatNotSupportedException(FileFormatNotSupportedException ex){
         String msg="File Format Not Supported";
         return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<Object> ExpiredJwtException(ExpiredJwtException ex){
+        String msg="Jwt Token Expired";
+        return new ResponseEntity<>(msg, HttpStatus.UNAUTHORIZED);
     }
 }

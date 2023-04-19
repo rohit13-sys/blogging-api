@@ -9,6 +9,7 @@ import com.example.blogging.payloads.UserDto;
 import com.example.blogging.payloads.UserResponse;
 import com.example.blogging.service.AuthService;
 import com.example.blogging.service.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.apache.catalina.session.StandardSession;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,5 +83,15 @@ public class AuthenticationController {
 
         return greeting;
     }
+
+    @PostMapping("/validtoken")
+    public ResponseEntity<Object> isTokenValid(@RequestBody String token){
+        boolean isTokenExpired=jwtUtil.isTokenExpired(token);
+        if(isTokenExpired){
+            throw new ExpiredJwtException(null,null,null);
+        }
+        return ResponseEntity.ok("Token is valid");
+    }
+
 
 }

@@ -75,16 +75,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDto> getAllCategories() {
-        System.out.println("First time call for all category");
+//        System.out.println("First time call for all category");
         List<CategoryDto> categories=new ArrayList<>();
         if(categoryMap.size()>0){
-            System.out.println("call to map for all category");
+//            System.out.println("call to map for all category");
             for(Map.Entry<String,CategoryDto> category:categoryMap.entrySet()){
                 categories.add(category.getValue());
             }
             return categories;
         }else{
-            System.out.println("call to DB for all category");
+//            System.out.println("call to DB for all category");
             categories=categoryRepository.findAll().stream().map(this::categoryToDto).collect(Collectors.toList());;
             return categories;
         }

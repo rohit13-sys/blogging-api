@@ -17,7 +17,7 @@ public class JWTUtil implements Serializable {
 
 	private static final long serialVersionUID = -2550185165626007488L;
 
-	public static final long JWT_TOKEN_VALIDITY = 200*60;
+	public static final long JWT_TOKEN_VALIDITY = 2*60;
 
 	private String secret="secret";
 
@@ -85,4 +85,5 @@ public class JWTUtil implements Serializable {
 		final String username = getUsernameFromToken(token);
 		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 	}
+
 }
