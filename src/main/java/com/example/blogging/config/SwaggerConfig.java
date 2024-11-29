@@ -2,6 +2,7 @@ package com.example.blogging.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.*;
@@ -41,5 +42,10 @@ public class SwaggerConfig {
         return new ApiInfo("Blogging Backend Application ", "this is backend application for Blogging", "1.0",
                 "Terms of Service", new Contact("RohitK", "url", "rohitkhatwani13@gmail.com")
                 , "license of APIS", "License URL", Collections.emptyList());
+    }
+
+    @Bean
+    public InternalResourceViewResolver defaultViewResolver() {
+        return new InternalResourceViewResolver();
     }
 }

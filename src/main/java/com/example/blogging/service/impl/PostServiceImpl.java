@@ -12,8 +12,7 @@ import com.example.blogging.repository.CategoryRepository;
 import com.example.blogging.repository.PostRepository;
 import com.example.blogging.repository.UserReposiory;
 import com.example.blogging.service.PostService;
-import org.apache.commons.io.FileDeleteStrategy;
-import org.apache.commons.io.FileUtils;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
@@ -74,6 +71,7 @@ public class PostServiceImpl implements PostService {
         return mapper.map(post, PostDto.class);
     }
 
+    @SneakyThrows
     @Override
     public PostDto updatePost(PostDto postDto, int id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("Post Not Found with id : " + id));
@@ -182,8 +180,8 @@ public class PostServiceImpl implements PostService {
         }
 
         try (InputStream inputStream = file.getInputStream()) {
-            String fileCode = RandomStringUtils.randomAlphanumeric(8);
-            fileName = fileCode + "_" + fileName;
+//            String fileCode = RandomStringUtils.randomAlphanumeric(8);
+            fileName = fileName;
             post.setImageName(fileName);
             post = postRepository.save(post);
             Path filePath = uploadPath.resolve(fileName);

@@ -1,5 +1,6 @@
 package com.example.blogging.payloads;
 
+import com.example.blogging.entity.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -34,7 +35,7 @@ public class UserDto {
     @NotEmpty
     private String about;
 
-    private List<RoleDto> roles=new ArrayList<>();
+    private List<Role> roles=new ArrayList<>();
 
 
     @JsonIgnore()

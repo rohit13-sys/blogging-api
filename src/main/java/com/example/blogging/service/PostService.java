@@ -1,7 +1,6 @@
 package com.example.blogging.service;
 
 
-import com.example.blogging.entity.Post;
 import com.example.blogging.payloads.PostDto;
 import com.example.blogging.payloads.PostResponse;
 import org.springframework.web.multipart.MultipartFile;

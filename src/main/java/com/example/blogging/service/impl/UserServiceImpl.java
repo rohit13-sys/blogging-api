@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
         List<Role> roles=new ArrayList<>();
         if(!userDto.getRoles().isEmpty()){
             List<RoleDto> roleDtos=new ArrayList<>();
-            for(RoleDto roleDto: userDto.getRoles()){
+            for(Role roleDto: userDto.getRoles()){
                 RoleDto role=roleService.getRole(roleDto.getName());
                 roleDtos.add(role);
             }

@@ -1,19 +1,13 @@
 package com.example.blogging.controller;
 
-import com.example.blogging.entity.Post;
-import com.example.blogging.exceptions.PostNotFoundException;
 import com.example.blogging.payloads.PostDto;
 import com.example.blogging.payloads.PostResponse;
 import com.example.blogging.service.AuthService;
-import com.example.blogging.service.FileService;
 import com.example.blogging.service.PostService;
 import com.example.blogging.utils.Constants;
-import com.mysql.fabric.Response;
-import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
