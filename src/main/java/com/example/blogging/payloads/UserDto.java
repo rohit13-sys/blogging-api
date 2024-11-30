@@ -1,5 +1,6 @@
 package com.example.blogging.payloads;
 
+import com.example.blogging.entity.Post;
 import com.example.blogging.entity.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -17,7 +18,7 @@ import java.util.*;
 @Data
 public class UserDto {
 
-    private int id;
+    private String id;
     @NotEmpty
     @Size(min = 4,message = "Name should be more than 4 characters")
     private String name;
@@ -36,6 +37,8 @@ public class UserDto {
     private String about;
 
     private List<Role> roles=new ArrayList<>();
+
+    private List<Post> posts = new ArrayList<>();
 
 
     @JsonIgnore()

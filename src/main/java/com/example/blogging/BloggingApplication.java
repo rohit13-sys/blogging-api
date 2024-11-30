@@ -5,6 +5,7 @@ import com.example.blogging.repository.CategoryRepository;
 import com.example.blogging.repository.RoleRepository;
 import com.example.blogging.service.CategoryService;
 import com.example.blogging.utils.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 @SpringBootApplication
 @EnableScheduling
+@Slf4j
 public class BloggingApplication implements CommandLineRunner {
 
 
@@ -50,14 +52,26 @@ public class BloggingApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+
+
 		Role role=new Role();
-		role.setId(Constants.NORMAL_USER_ID);
-		role.setName(Constants.NORMAL_USER);
+		if(roleRepository.findByName(Constants.NORMAL_USER).isEmpty()){
+			role.setName(Constants.NORMAL_USER);
+			roleRepository.save(role);
+		}else {
+			log.info("Role with name "+Constants.NORMAL_USER+" Already exists");
+		}
+
 
 		Role role1=new Role();
-		role1.setId(Constants.ADMIN_USER_ID);
-		role1.setName(Constants.ADMIN_USER);
-		roleRepository.saveAll(List.of(role,role1));
+		if(roleRepository.findByName(Constants.ADMIN_USER).isEmpty()){
+			role1.setName(Constants.ADMIN_USER);
+			roleRepository.save(role1);
+		}else {
+			log.info("Role with name "+Constants.ADMIN_USER+" Already exists");
+		}
+
+//		roleRepository.saveAll(List.of(role,role1));
 
 
 		List<CategoryDto> categories=categoryRepository.findAll().stream()

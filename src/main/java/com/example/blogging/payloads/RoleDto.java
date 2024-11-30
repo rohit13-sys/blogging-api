@@ -8,7 +8,7 @@ import lombok.Setter;
 public class RoleDto {
 
 
-    private int id;
+    private String id;
 
     private String name;
 }

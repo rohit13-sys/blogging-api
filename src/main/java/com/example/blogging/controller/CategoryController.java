@@ -37,7 +37,7 @@ public class CategoryController {
     @PutMapping("/update-category")
     public ResponseEntity<Object> updateCategoryByTitle(@Valid @RequestBody CategoryDto categoryDto){
 
-        int id=categoryService.getCategoryIdByCategoryName(categoryDto.getCategoryTitle());
+        String id=categoryService.getCategoryIdByCategoryName(categoryDto.getCategoryTitle());
         categoryDto=categoryService.updateCategory(id,categoryDto);
         return new ResponseEntity<>(categoryDto, HttpStatus.OK);
 
@@ -46,7 +46,7 @@ public class CategoryController {
     @DeleteMapping("/delete-category")
     public ResponseEntity<Object> deleteCategoryByTitle(@Valid @RequestBody CategoryDto categoryDto){
 
-        int id=categoryService.getCategoryIdByCategoryName(categoryDto.getCategoryTitle());
+        String id=categoryService.getCategoryIdByCategoryName(categoryDto.getCategoryTitle());
         categoryService.deleteCategory(id);
         return new ResponseEntity<>("Category : "+categoryDto.getCategoryTitle()+" is deleted successfully", HttpStatus.OK);
 

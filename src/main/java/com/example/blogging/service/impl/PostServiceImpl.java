@@ -13,7 +13,6 @@ import com.example.blogging.repository.PostRepository;
 import com.example.blogging.repository.UserReposiory;
 import com.example.blogging.service.PostService;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,9 +58,9 @@ public class PostServiceImpl implements PostService {
     String uploadDir;
 
     @Override
-    public PostDto createPost(PostDto postDto, int userId, int categoryId) {
+    public PostDto createPost(PostDto postDto, String userId, String categoryId) {
         Users user = userReposiory.findById(userId).orElseThrow(() -> new UserNotFound("User Not Found!!"));
-        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFound("User Not Found!!"));
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFound("Category Not Found!!"));
         Post post = mapper.map(postDto, Post.class);
         post.setImageName("default.jpg");
         post.setAddedDate(new Date());
@@ -73,14 +72,14 @@ public class PostServiceImpl implements PostService {
 
     @SneakyThrows
     @Override
-    public PostDto updatePost(PostDto postDto, int id) {
+    public PostDto updatePost(PostDto postDto, String id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("Post Not Found with id : " + id));
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setDescription(postDto.getDescription());
         post.setLikeCounts(postDto.getLikeCounts());
         post.setDislikeCounts(post.getDislikeCounts());
-        if (!postDto.getImageName().isBlank()) {
+        if (postDto.getImageName()!=null && !postDto.getImageName().isBlank()) {
             post.setImageName(postDto.getImageName());
         }
         post.setAddedDate(new Date());
@@ -120,15 +119,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto getPostById(int postId) {
+    public PostDto getPostById(String postId) {
 
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("Post Not Found with id : " + postId));
-        if(likesMap.containsKey(String.valueOf(postId))){
-            long likeCounts=likesMap.get(String.valueOf(postId));
+        if(likesMap.containsKey(postId)){
+            long likeCounts=likesMap.get(postId);
             post.setLikeCounts(likeCounts);
         }
-        if(dislikesMap.containsKey(String.valueOf(postId))){
-            long dislikeCounts= dislikesMap.get(String.valueOf(postId));
+        if(dislikesMap.containsKey(postId)){
+            long dislikeCounts= dislikesMap.get(postId);
             post.setDislikeCounts(dislikeCounts);
         }
         PostDto dto = mapper.map(post, PostDto.class);
@@ -136,7 +135,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getPostByCategory(int categoryId) {
+    public List<PostDto> getPostByCategory(String categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFound("Category not found"));
         List<Post> post = postRepository.findByCategory(category);
         return post.stream().map((p) -> mapper.map(p, PostDto.class)).collect(Collectors.toList());
@@ -144,7 +143,7 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public PostResponse getPostByUser(int userId, Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
+    public PostResponse getPostByUser(String userId, Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 //        Users user = userReposiory.findById(userId).orElseThrow(() -> new UserNotFound("User not found"));
@@ -170,7 +169,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto uploadImage(String fileName, MultipartFile file, int id) throws IOException {
+    public PostDto uploadImage(String fileName, MultipartFile file, String id) throws IOException {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("Post Not Found Exception"));
 
         Path uploadPath = Paths.get(uploadDir + File.separator + id);
@@ -193,7 +192,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public InputStream getImage(Integer id) throws FileNotFoundException {
+    public InputStream getImage(String id) throws FileNotFoundException {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostNotFoundException("Post Not Found"));
         String fileName = post.getImageName();
         String fullPath = uploadDir + File.separator + id + File.separator + fileName;
@@ -211,7 +210,7 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public void storeLikeCounts(Integer postId, Long likeCounts,Long dislikeCounts) {
+    public void storeLikeCounts(String postId, Long likeCounts, Long dislikeCounts) {
         likesMap.put(String.valueOf(postId),likeCounts);
         dislikesMap.put(String.valueOf(postId),dislikeCounts);
     }
@@ -223,7 +222,7 @@ public class PostServiceImpl implements PostService {
     public void storeLikes(){
         if(!likesMap.isEmpty() || !dislikesMap.isEmpty()){
                     for (Map.Entry<String,Long> like: likesMap.entrySet()) {
-                        int postId = Integer.parseInt(like.getKey());
+                        String postId = like.getKey();
                         long likeCounts = like.getValue();
                         PostDto post = getPostById(postId);
                         post.setLikeCounts(likeCounts);
@@ -234,7 +233,7 @@ public class PostServiceImpl implements PostService {
 
         if(!dislikesMap.isEmpty()){
             for (Map.Entry<String,Long> dislike: dislikesMap.entrySet()) {
-                int postId = Integer.parseInt(dislike.getKey());
+                String postId = dislike.getKey();
                 long dislikeCounts = dislike.getValue();
                 PostDto post = getPostById(postId);
                 post.setDislikeCounts(dislikeCounts);
@@ -244,4 +243,10 @@ public class PostServiceImpl implements PostService {
         }
 
     }
+
+    public void cleanUpAllImagesInIntervals(){
+
+    }
+
+
 }

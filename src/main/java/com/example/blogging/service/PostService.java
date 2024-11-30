@@ -13,27 +13,27 @@ import java.util.List;
 public interface PostService {
 
 
-    PostDto createPost(PostDto postDto, int userId, int categoryId);
+    PostDto createPost(PostDto postDto, String userId, String categoryId);
 
-    PostDto updatePost(PostDto postDto,int id);
+    PostDto updatePost(PostDto postDto, String id);
 
     void deletePost(PostDto postDto) throws IOException;
 
     PostResponse getAllPosts(Integer pageNumber, Integer pageSize,String sortBy,String sortDir);
 
-    PostDto getPostById(int postId);
+    PostDto getPostById(String postId);
 
-    List<PostDto> getPostByCategory(int categoryId);
+    List<PostDto> getPostByCategory(String categoryId);
 
 
-    PostResponse getPostByUser(int userId,Integer pageNumber, Integer pageSize,String sortBy,String sortDir);
+    PostResponse getPostByUser(String userId, Integer pageNumber, Integer pageSize, String sortBy, String sortDir);
 
     List<PostDto> searchPosts(String keyword);
 
 
-    PostDto uploadImage(String fileName, MultipartFile file, int id) throws IOException;
+    PostDto uploadImage(String fileName, MultipartFile file, String id) throws IOException;
 
-    InputStream getImage(Integer id) throws FileNotFoundException;
+    InputStream getImage(String id) throws FileNotFoundException;
 
-    void storeLikeCounts(Integer postId,Long likeCounts,Long dislikeCounts);
+    void storeLikeCounts(String postId, Long likeCounts, Long dislikeCounts);
 }

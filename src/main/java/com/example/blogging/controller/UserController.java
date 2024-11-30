@@ -47,7 +47,7 @@ public class UserController {
     @PutMapping("/update-user")
     public ResponseEntity<Object> updateUserByEmail(@Valid @RequestBody UserDto userDto) {
 
-        int id = service.getUserIdByUserName(userDto.getEmail());
+        String id = service.getUserIdByUserName(userDto.getEmail());
         userDto = service.updateUser(id, userDto);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
 
@@ -56,7 +56,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/delete-user/{id}")
-    public ResponseEntity<Object> deleteUserByEmail(@PathVariable("id") Integer id) {
+    public ResponseEntity<Object> deleteUserByEmail(@PathVariable("id") String id) {
 
         service.deleteUserByUserName(id);
         return new ResponseEntity<>("User with id : " + id + " is deleted successfully", HttpStatus.OK);

@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 public class UserResponse {
 
-    private int id;
+    private String id;
 
     private String name;
 

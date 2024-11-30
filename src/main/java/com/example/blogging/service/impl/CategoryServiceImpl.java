@@ -1,7 +1,6 @@
 package com.example.blogging.service.impl;
 
 import com.example.blogging.entity.Category;
-import com.example.blogging.entity.Users;
 import com.example.blogging.exceptions.CaregoryAlreadyExists;
 import com.example.blogging.exceptions.CategoryNotFound;
 import com.example.blogging.exceptions.UserNotFound;
@@ -11,7 +10,6 @@ import com.example.blogging.service.CategoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -52,7 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public CategoryDto updateCategory(int id, CategoryDto categoryDto) {
+    public CategoryDto updateCategory(String id, CategoryDto categoryDto) {
         Category category=categoryRepository.findById(id).get();
         category.setCategoryDescription(categoryDto.getCategoryDescription());
         categoryRepository.save(category);
@@ -92,12 +90,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void deleteCategory(int id) {
+    public void deleteCategory(String id) {
       categoryRepository.deleteById(id);
     }
 
     @Override
-    public int getCategoryIdByCategoryName(String categoryName) {
+    public String getCategoryIdByCategoryName(String categoryName) {
         Category category=categoryRepository.findByCategoryTitle(categoryName);
         if (category != null) {
             return category.getId();

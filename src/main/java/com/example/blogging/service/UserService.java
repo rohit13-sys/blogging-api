@@ -9,14 +9,14 @@ public interface UserService {
 
     UserDto createUser(UserDto userDto) throws UserAlreadyExists;
 
-    UserDto updateUser(int id,UserDto userDto);
+    UserDto updateUser(String id,UserDto userDto);
 
     UserDto getUserByUserName(String userName);
 
 
     List<UserDto> getAllUsers();
-    void deleteUserByUserName(int id);
-    int getUserIdByUserName(String userName);
+    void deleteUserByUserName(String id);
+    String getUserIdByUserName(String userName);
 
-    UserDto getUserById(Integer id);
+    UserDto getUserById(String id);
 }

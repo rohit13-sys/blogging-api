@@ -6,7 +6,6 @@ import com.example.blogging.entity.Users;
 import com.example.blogging.exceptions.CommentNotFoundException;
 import com.example.blogging.exceptions.PostNotFoundException;
 import com.example.blogging.payloads.CommentDto;
-import com.example.blogging.payloads.PostDto;
 import com.example.blogging.payloads.UserDto;
 import com.example.blogging.repository.CommentRepository;
 import com.example.blogging.repository.PostRepository;
@@ -40,7 +39,7 @@ public class CommentServiceImpl implements CommentService {
     private ModelMapper modelMapper;
 
     @Override
-    public CommentDto createComment(CommentDto commentDto, Integer userId,int postId) {
+    public CommentDto createComment(CommentDto commentDto, String userId, String postId) {
         UserDto userDto=userService.getUserById(userId);
 //        PostDto postdto = postService.getPostById(postId);
         Post post=postRepository.findById(postId).orElseThrow(()->new PostNotFoundException("Post not found"));
@@ -54,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(int commentId) {
+    public void deleteComment(String commentId) {
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("Comment Not Found"));

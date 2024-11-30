@@ -35,13 +35,13 @@ public class PostController {
 
     @PostMapping("/user/{user-id}/category/{category-id}/posts")
     public ResponseEntity<Object> createPost(@RequestBody PostDto postDto,
-                                             @PathVariable("user-id") Integer userId, @PathVariable("category-id") int categoryId) {
+                                             @PathVariable("user-id") String userId, @PathVariable("category-id") String categoryId) {
         PostDto post = postService.createPost(postDto, userId, categoryId);
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
 
     @GetMapping("/user/{user-id}/posts")
-    public ResponseEntity<Object> getPostsByUser(@PathVariable("user-id") Integer userId,
+    public ResponseEntity<Object> getPostsByUser(@PathVariable("user-id") String userId,
                                                  @RequestParam(value = "pageNo", defaultValue = Constants.PAGE_NUMBER, required = false) Integer pageNumber,
                                                  @RequestParam(value = "pageSize", defaultValue = Constants.PAGE_SIZE, required = false) Integer pageSize,
                                                  @RequestParam(value = "sortBy", defaultValue = Constants.SORT_BY, required = false) String sortBy,
@@ -51,7 +51,7 @@ public class PostController {
     }
 
     @GetMapping("/category/{category-id}/posts")
-    public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable("category-id") Integer categoryId
+    public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable("category-id") String categoryId
 
     ) {
         List<PostDto> postResponse = postService.getPostByCategory(categoryId);
@@ -70,7 +70,7 @@ public class PostController {
 
 
     @DeleteMapping("/delete-posts/{post-id}")
-    public ResponseEntity<Object> deletePostById(@PathVariable("post-id") Integer id) throws IOException {
+    public ResponseEntity<Object> deletePostById(@PathVariable("post-id") String id) throws IOException {
 
         PostDto postDto = postService.getPostById(id);
 
@@ -83,7 +83,7 @@ public class PostController {
     }
 
     @PutMapping("/update-posts/{post-id}")
-    public ResponseEntity<Object> updatePostById(@RequestBody PostDto postDto, @PathVariable("post-id") int id) {
+    public ResponseEntity<Object> updatePostById(@RequestBody PostDto postDto, @PathVariable("post-id") String id) {
         postDto = postService.updatePost(postDto, id);
         return new ResponseEntity<>(postDto, HttpStatus.OK);
     }
@@ -95,7 +95,7 @@ public class PostController {
     }
 
     @PostMapping(value = "/image-upload/{post-id}")
-    public ResponseEntity<Object> uploadImage(@PathVariable("post-id") Integer postId, @RequestParam(value = "image") MultipartFile file) throws IOException {
+    public ResponseEntity<Object> uploadImage(@PathVariable("post-id") String postId, @RequestParam(value = "image") MultipartFile file) throws IOException {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         PostDto postDto = postService.uploadImage(fileName, file, postId);
         return new ResponseEntity<>(postDto, HttpStatus.OK);
@@ -103,14 +103,14 @@ public class PostController {
 
 
     @GetMapping(value = "/image/{postId}")
-    public @ResponseBody byte[] serveImage(@PathVariable("postId") Integer postId, HttpServletResponse response) throws IOException {
+    public @ResponseBody byte[] serveImage(@PathVariable("postId") String postId, HttpServletResponse response) throws IOException {
         InputStream is = postService.getImage(postId);
         response.setContentType(MediaType.IMAGE_JPEG_VALUE);
         return IOUtils.toByteArray(is);
     }
 
     @GetMapping("/posts/{post-id}")
-    public ResponseEntity<Object> getPostById(@PathVariable("post-id") Integer postId) {
+    public ResponseEntity<Object> getPostById(@PathVariable("post-id") String postId) {
 
         PostDto postDto = postService.getPostById(postId);
         return new ResponseEntity<>(postDto, HttpStatus.OK);
@@ -118,7 +118,7 @@ public class PostController {
 
 
     @PutMapping("/post/like/{postId}/{likeCounts}/{dislikeCounts}")
-    public ResponseEntity<Object> storeLikedCounts(@PathVariable Integer postId,@PathVariable Long likeCounts,@PathVariable Long dislikeCounts){
+    public ResponseEntity<Object> storeLikedCounts(@PathVariable String postId,@PathVariable Long likeCounts,@PathVariable Long dislikeCounts){
         System.out.println("PostId : "+postId+" LikeCounts : "+likeCounts+" DislikeCounts : "+dislikeCounts);
         postService.storeLikeCounts(postId,likeCounts,dislikeCounts);
         return new ResponseEntity<>(HttpStatus.OK);

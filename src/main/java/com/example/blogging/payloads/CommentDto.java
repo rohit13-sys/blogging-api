@@ -9,7 +9,7 @@ import lombok.Setter;
 @Data
 public class CommentDto {
 
-    private int id;
+    private String id;
 
     private String content;
 

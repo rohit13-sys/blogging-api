@@ -1,9 +1,11 @@
 package com.example.blogging.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,9 +24,13 @@ import java.util.stream.Collectors;
 public class Users implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
     @Column(name = "user_id")
-    private int id;
+    private String id;
 
     @Column(name = "user_name", nullable = false, length = 100)
     private String name;
@@ -36,13 +42,11 @@ public class Users implements UserDetails {
 
     private String about;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Post> posts = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @NotEmpty
     @JoinTable(name = "user_role",
-            joinColumns = @JoinColumn(name = "user", referencedColumnName = "user_id"),
+            joinColumns = @JoinColumn(name = "users", referencedColumnName = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role", referencedColumnName = "id"))
     private List<Role> roles = new ArrayList<>();
 

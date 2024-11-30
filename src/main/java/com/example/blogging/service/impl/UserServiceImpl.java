@@ -10,7 +10,6 @@ import com.example.blogging.repository.UserReposiory;
 import com.example.blogging.service.RoleService;
 import com.example.blogging.service.UserService;
 import com.example.blogging.utils.Constants;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -57,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserDto updateUser(int id,UserDto userDto) {
+    public UserDto updateUser(String id,UserDto userDto) {
        Users user=userReposiory.findById(id).get();
        user.setName(userDto.getName());
        user.setAbout(user.getAbout());
@@ -87,7 +86,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void deleteUserByUserName(int id) {
+    public void deleteUserByUserName(String id) {
         try {
             Users user = userReposiory.findById(id).get();
             userReposiory.delete(user);
@@ -97,7 +96,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int getUserIdByUserName(String userName) {
+    public String getUserIdByUserName(String userName) {
         Users user=userReposiory.findByEmail(userName).orElseThrow(()->new UsernameNotFoundException("USer Not Found"));
         if (user != null) {
                 return user.getId();
@@ -141,7 +140,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserById(Integer id) {
+    public UserDto getUserById(String id) {
         Users user=userReposiory.findById(id).orElseThrow(UserNotFound::new);
         UserDto userDto=userToDto(user);
         return userDto;

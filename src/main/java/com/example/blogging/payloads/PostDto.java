@@ -16,7 +16,7 @@ import java.util.Set;
 @Setter
 public class PostDto {
 
-    private int id;
+    private String id;
     private String title;
 
     private String imageName;

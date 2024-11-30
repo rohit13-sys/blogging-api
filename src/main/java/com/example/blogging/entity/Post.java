@@ -1,9 +1,11 @@
 package com.example.blogging.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.*;
@@ -17,9 +19,12 @@ import java.util.*;
 public class Post {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id")
-    private int id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    private String id;
 
     @Column(name = "post_title")
     private String title;
@@ -28,7 +33,7 @@ public class Post {
 
     private String description;
 
-    @Column(columnDefinition = "longtext")
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private Date addedDate;

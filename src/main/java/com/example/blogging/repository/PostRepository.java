@@ -12,11 +12,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PostRepository extends JpaRepository<Post,Integer> {
+public interface PostRepository extends JpaRepository<Post,String> {
 
     List<Post> findByCategory(Category category);
 
-    Page<Post> findByUserId(int userId,Pageable pageable);
+    Page<Post> findByUserId(String userId,Pageable pageable);
 
     @Query("select p from Post p where title like %?1% OR content like %?1%")
     List<Post> findByTitleOrContentContains(String keyword);
